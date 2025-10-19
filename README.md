@@ -9,14 +9,19 @@
 ## Funcionalidades - Agentes
 ### Orquestrador
 Delega as funções entre os devidos agentes, assim como recebe as entradas e saídas.
-### Notícias
-Busca as notícias do Research do BTG Pactual mais relevantes para o portfólio do usuário.
+[Workflow do orquestrador central](../Orquestrador.png)
 ### Buy/Sell
 Permite a compra e venda de ativos de forma rápida.
+
+### Notícias
+Busca as notícias do Research do BTG Pactual mais relevantes para o portfólio do usuário.
+
 ### Resumo de notícias
-Permite a sintese das notícias do Research do BTG Pactual: busca a notícia completa através de um link e resume-a.
+Permite a síntese das notícias do Research do BTG Pactual: busca a notícia completa através de um link e resume-a.
+
 ### Analisar carteira
 Busca os ativos do portfólio do usuário e analisa como aqueles ativos estão se comportando com o tempo.
+
 ### Conversacional
 Gera recomendações de investimento e gerencia conversas gerais.
 
