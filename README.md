@@ -1,9 +1,10 @@
 # Agente Financeiro para Telegram BTG
+## Nome da equipe: 93
 ## Participantes
-Arthur Alexandre Santos Santana  
-Arthur Martins Pereira  
-Christyan Paniago Nantes  
-Giovanna Nascimento Noventa  
+- Arthur Alexandre Santos Santana  
+- Arthur Martins Pereira  
+- Christyan Paniago Nantes  
+- Giovanna Nascimento Noventa  
 
 ## Funcionalidades - Agentes
 ### Orquestrador
