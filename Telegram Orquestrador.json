@@ -1,0 +1,1056 @@
+{
+  "name": "Telegram Orquestrador",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "id": "58c57e56-4ef0-4701-acad-d35b5a476d90",
+      "name": "Download Voice Message",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        1632,
+        672
+      ],
+      "webhookId": "d3e9d36d-6402-45d6-9f56-5886e616f9fa",
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "X75XaG4OFZpmWx6J",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "fcb767ee-565e-4b56-a54e-6f97f739fc24",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message.text }}",
+                    "rightValue": ""
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "c1016c40-f8f2-4e08-8ec8-5cdb88f5c87a",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message.voice }}",
+                    "rightValue": ""
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Voice Message"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "f8150ac7-eea4-4658-8da9-f7a1c88a471d",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message.photo[0].file_id }}",
+                    "rightValue": ""
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Image"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "ignoreCase": false,
+          "allMatchingOutputs": true
+        }
+      },
+      "id": "5a65be27-6493-4d5f-89a4-bf9584a3dbfa",
+      "name": "Input Message Router1",
+      "type": "n8n-nodes-base.switch",
+      "position": [
+        1248,
+        768
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "801ec600-22ad-4a94-a2b4-ae72eb271df0",
+              "name": "message",
+              "type": "string",
+              "value": "={{ $('Telegram Trigger').item.json.message.text }}"
+            },
+            {
+              "id": "263071fb-bcdf-42b0-bb46-71b75fa0bf2a",
+              "name": "chat_id",
+              "type": "string",
+              "value": "={{ $('Telegram Trigger').item.json.message.chat.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c1ee321e-531a-4d16-975e-09a6d95ebb63",
+      "name": "get_message (text)",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1632,
+        512
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.photo[3]?.file_id || $('Telegram Trigger').item.json.message.photo[2]?.file_id || $('Telegram Trigger').item.json.message.photo[1]?.file_id }}",
+        "additionalFields": {}
+      },
+      "id": "6c1b04cd-b756-47fa-a930-f7a797f28490",
+      "name": "Download IMAGE",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        1632,
+        848
+      ],
+      "webhookId": "b4a21f4c-e6a6-4c83-9e8e-af73cb7cc96a",
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "X75XaG4OFZpmWx6J",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "=",
+        "inputType": "binary",
+        "options": {}
+      },
+      "id": "9ba519e0-b3a5-466e-9905-5fccbaaf9f09",
+      "name": "Analyze image",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "position": [
+        1968,
+        848
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "idmpDg7SRgYSVKdz",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "Você receberá um áudio em português. O transcreva, sem adições ao texto. Novamente, não adicione nada ao texto transcrito.",
+        "inputType": "binary",
+        "options": {}
+      },
+      "id": "962b1fc7-53ef-42e4-87b7-412eb62cc332",
+      "name": "Analyze voice message",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "position": [
+        1968,
+        672
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "idmpDg7SRgYSVKdz",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d8935452-fe20-469d-a68d-1aad056cb8dd",
+              "name": "message",
+              "type": "string",
+              "value": "={{ $json.candidates?.[0]?.content?.parts?.[0]?.text || $json.content?.parts?.[0]?.text }}"
+            },
+            {
+              "id": "93f1bba1-1180-404a-93ca-c34cf1d1b7ac",
+              "name": "chat_id",
+              "type": "string",
+              "value": "={{ $('Telegram Trigger').item.json.message.chat.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "731d23cd-7152-445d-a078-d735ecd99cc0",
+      "name": "get_message (Audio/Video message)",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2128,
+        704
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d8935452-fe20-469d-a68d-1aad056cb8dd",
+              "name": "message",
+              "type": "string",
+              "value": "=Content:\n{{ $json.content.parts[0].text }}"
+            },
+            {
+              "id": "53e34499-7dad-4f94-aa7d-f778321f13f4",
+              "name": "chat_id",
+              "type": "string",
+              "value": "={{ $('Telegram Trigger').item.json.message.chat.id }}"
+            },
+            {
+              "id": "91c7374c-fd5f-4a69-b709-a49d13474336",
+              "name": "number",
+              "value": "={{ $json.telefone }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "37ae2c71-922d-485f-a511-6d2c7f205ac9",
+      "name": "get_message (Media  message)",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2256,
+        848
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "jsCode": "// --- Mapa Extendido de Tipos MIME ---\n// Una lista completa para cubrir la mayoría de los formatos de archivo comunes.\nconst mimeMap = {\n  // --- Formatos de Documentos ---\n  'pdf': 'application/pdf',\n  'txt': 'text/plain',\n  'rtf': 'application/rtf',\n  'csv': 'text/csv',\n  'html': 'text/html',\n  'htm': 'text/html',\n  'json': 'application/json',\n  'xml': 'application/xml', // 'text/xml' también es válido pero 'application/xml' es más común\n  'yaml': 'application/x-yaml',\n  'yml': 'application/x-yaml',\n\n  // --- Formatos de Microsoft Office ---\n  'doc': 'application/msword',\n  'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',\n  'xls': 'application/vnd.ms-excel',\n  'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',\n  'ppt': 'application/vnd.ms-powerpoint',\n  'pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',\n  'pub': 'application/vnd.ms-publisher',\n\n  // --- Formatos de OpenOffice / LibreOffice ---\n  'odt': 'application/vnd.oasis.opendocument.text',\n  'ods': 'application/vnd.oasis.opendocument.spreadsheet',\n  'odp': 'application/vnd.oasis.opendocument.presentation',\n  'odg': 'application/vnd.oasis.opendocument.graphics',\n\n  // --- Formatos de Apple iWork ---\n  'pages': 'application/vnd.apple.pages',\n  'numbers': 'application/vnd.apple.numbers',\n  'key': 'application/vnd.apple.keynote',\n\n  // --- Formatos de Imagen ---\n  'png': 'image/png',\n  'jpg': 'image/jpeg',\n  'jpeg': 'image/jpeg',\n  'gif': 'image/gif',\n  'webp': 'image/webp',\n  'svg': 'image/svg+xml',\n  'bmp': 'image/bmp',\n  'ico': 'image/vnd.microsoft.icon',\n  'tif': 'image/tiff',\n  'tiff': 'image/tiff',\n  'heic': 'image/heic',\n  'heif': 'image/heif',\n\n  // --- Formatos de Audio ---\n  'mp3': 'audio/mpeg',\n  'wav': 'audio/wav',\n  'oga': 'audio/ogg',\n  'ogg': 'audio/ogg',\n  'flac': 'audio/flac',\n  'm4a': 'audio/mp4',\n  'aac': 'audio/aac',\n  'opus': 'audio/opus',\n  'wma': 'audio/x-ms-wma',\n  'mid': 'audio/midi',\n  'midi': 'audio/midi',\n\n  // --- Formatos de Video ---\n  'mp4': 'video/mp4',\n  'mov': 'video/quicktime',\n  'webm': 'video/webm',\n  'mpeg': 'video/mpeg',\n  'mpg': 'video/mpeg',\n  'avi': 'video/x-msvideo',\n  'wmv': 'video/x-ms-wmv',\n  'flv': 'video/x-flv',\n  'mkv': 'video/x-matroska',\n\n  // --- Formatos de Archivos y Compresión ---\n  'zip': 'application/zip',\n  'rar': 'application/vnd.rar',\n  '7z': 'application/x-7z-compressed',\n  'tar': 'application/x-tar',\n  'gz': 'application/gzip',\n  'bz2': 'application/x-bzip2',\n\n  // --- Otros Formatos ---\n  'epub': 'application/epub+zip',\n  'ics': 'text/calendar',\n  'vcf': 'text/vcard',\n  'js': 'text/javascript',\n  'css': 'text/css',\n  'sh': 'application/x-sh',\n  'py': 'text/x-python',\n};\n\n// --- Lógica de Procesamiento (sin cambios) ---\n\n// Obtenemos todos los items que llegan al nodo\nconst items = $input.all();\n\n// Iteramos sobre cada item para procesarlo\nfor (const item of items) {\n  // Verificamos que el item tenga datos binarios para procesar\n  if (item.binary && item.binary['data']) {\n    // Obtenemos el nombre del archivo de forma segura\n    const fileName = item.binary['data'].fileName || '';\n    if (!fileName) {\n      continue; // Si no hay nombre de archivo, pasamos al siguiente item\n    }\n\n    // Extraemos la extensión del archivo de forma robusta\n    const extension = fileName.slice((fileName.lastIndexOf(\".\") - 1 >>> 0) + 2).toLowerCase();\n\n    // Buscamos la extensión en nuestro mapa\n    const newMimeType = mimeMap[extension];\n\n    // Si encontramos una coincidencia en el mapa, actualizamos el mimeType\n    if (newMimeType) {\n      if(item.binary['data'].mimeType !== newMimeType) {\n        console.log(`Cambiando mimeType para '${fileName}' de '${item.binary['data'].mimeType}' a '${newMimeType}'.`);\n        item.binary['data'].mimeType = newMimeType;\n      }\n    }\n  }\n}\n\n// Devolvemos todos los items, modificados o no\nreturn items;"
+      },
+      "id": "2c34e6e2-0e62-4bed-acaa-efdf6c60db05",
+      "name": "Fix mime",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1808,
+        672
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "// --- Mapa Extendido de Tipos MIME ---\n// Una lista completa para cubrir la mayoría de los formatos de archivo comunes.\nconst mimeMap = {\n  // --- Formatos de Documentos ---\n  'pdf': 'application/pdf',\n  'txt': 'text/plain',\n  'rtf': 'application/rtf',\n  'csv': 'text/csv',\n  'html': 'text/html',\n  'htm': 'text/html',\n  'json': 'application/json',\n  'xml': 'application/xml', // 'text/xml' también es válido pero 'application/xml' es más común\n  'yaml': 'application/x-yaml',\n  'yml': 'application/x-yaml',\n\n  // --- Formatos de Microsoft Office ---\n  'doc': 'application/msword',\n  'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',\n  'xls': 'application/vnd.ms-excel',\n  'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',\n  'ppt': 'application/vnd.ms-powerpoint',\n  'pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',\n  'pub': 'application/vnd.ms-publisher',\n\n  // --- Formatos de OpenOffice / LibreOffice ---\n  'odt': 'application/vnd.oasis.opendocument.text',\n  'ods': 'application/vnd.oasis.opendocument.spreadsheet',\n  'odp': 'application/vnd.oasis.opendocument.presentation',\n  'odg': 'application/vnd.oasis.opendocument.graphics',\n\n  // --- Formatos de Apple iWork ---\n  'pages': 'application/vnd.apple.pages',\n  'numbers': 'application/vnd.apple.numbers',\n  'key': 'application/vnd.apple.keynote',\n\n  // --- Formatos de Imagen ---\n  'png': 'image/png',\n  'jpg': 'image/jpeg',\n  'jpeg': 'image/jpeg',\n  'gif': 'image/gif',\n  'webp': 'image/webp',\n  'svg': 'image/svg+xml',\n  'bmp': 'image/bmp',\n  'ico': 'image/vnd.microsoft.icon',\n  'tif': 'image/tiff',\n  'tiff': 'image/tiff',\n  'heic': 'image/heic',\n  'heif': 'image/heif',\n\n  // --- Formatos de Audio ---\n  'mp3': 'audio/mpeg',\n  'wav': 'audio/wav',\n  'oga': 'audio/ogg',\n  'ogg': 'audio/ogg',\n  'flac': 'audio/flac',\n  'm4a': 'audio/mp4',\n  'aac': 'audio/aac',\n  'opus': 'audio/opus',\n  'wma': 'audio/x-ms-wma',\n  'mid': 'audio/midi',\n  'midi': 'audio/midi',\n\n  // --- Formatos de Video ---\n  'mp4': 'video/mp4',\n  'mov': 'video/quicktime',\n  'webm': 'video/webm',\n  'mpeg': 'video/mpeg',\n  'mpg': 'video/mpeg',\n  'avi': 'video/x-msvideo',\n  'wmv': 'video/x-ms-wmv',\n  'flv': 'video/x-flv',\n  'mkv': 'video/x-matroska',\n\n  // --- Formatos de Archivos y Compresión ---\n  'zip': 'application/zip',\n  'rar': 'application/vnd.rar',\n  '7z': 'application/x-7z-compressed',\n  'tar': 'application/x-tar',\n  'gz': 'application/gzip',\n  'bz2': 'application/x-bzip2',\n\n  // --- Otros Formatos ---\n  'epub': 'application/epub+zip',\n  'ics': 'text/calendar',\n  'vcf': 'text/vcard',\n  'js': 'text/javascript',\n  'css': 'text/css',\n  'sh': 'application/x-sh',\n  'py': 'text/x-python',\n};\n\n// --- Lógica de Procesamiento (sin cambios) ---\n\n// Obtenemos todos los items que llegan al nodo\nconst items = $input.all();\n\n// Iteramos sobre cada item para procesarlo\nfor (const item of items) {\n  // Verificamos que el item tenga datos binarios para procesar\n  if (item.binary && item.binary['data']) {\n    // Obtenemos el nombre del archivo de forma segura\n    const fileName = item.binary['data'].fileName || '';\n    if (!fileName) {\n      continue; // Si no hay nombre de archivo, pasamos al siguiente item\n    }\n\n    // Extraemos la extensión del archivo de forma robusta\n    const extension = fileName.slice((fileName.lastIndexOf(\".\") - 1 >>> 0) + 2).toLowerCase();\n\n    // Buscamos la extensión en nuestro mapa\n    const newMimeType = mimeMap[extension];\n\n    // Si encontramos una coincidencia en el mapa, actualizamos el mimeType\n    if (newMimeType) {\n      if(item.binary['data'].mimeType !== newMimeType) {\n        console.log(`Cambiando mimeType para '${fileName}' de '${item.binary['data'].mimeType}' a '${newMimeType}'.`);\n        item.binary['data'].mimeType = newMimeType;\n      }\n    }\n  }\n}\n\n// Devolvemos todos los items, modificados o no\nreturn items;"
+      },
+      "id": "a026a358-dcc4-45d1-8bcb-386d9077cc02",
+      "name": "Fix mime5",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1808,
+        848
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "5a4dd22d-230c-4f2f-ae4a-d42f75b077c9",
+      "name": "Send a text message",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        3472,
+        736
+      ],
+      "webhookId": "a23f92f8-c4e9-44a5-8c17-e7623f18a851",
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "X75XaG4OFZpmWx6J",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "id": "a26c48da-f470-4ff9-83ea-c8cc9868b320",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        2960,
+        992
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "idmpDg7SRgYSVKdz",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Telegram Trigger').item.json.message.text || $('get_message (Audio/Video message)').item.json.message || $('get_message (Media  message)').item.json.message }}",
+        "options": {
+          "systemMessage": "=Seu Papel: Você é uma IA orquestradora de roteamento.\n\nSua Única Tarefa: Analisar a MENSAGEM DO USUÁRIO e selecionar exatamente um \"CASO DE USO\" (ferramenta) da lista abaixo para lidar com a solicitação.\n\n# FERRAMENTAS\n\n[Buscar Noticias]\n* Quando usar: Quando o usuário pedir notícias (seja em geral, sobre seu portfólio ou sobre uma empresa específica). Após receber as notícias, entrege-as na íntegra, sem alterações.\n* Exemplos: \"me dê notícias\", \"quais são as últimas notícias sobre [empresa]?\", \"noticias\"\n\n[Resumir Noticia]\n* Quando usar: Quando o usuário pedir um resumo de um artigo (geralmente um que está em contexto), perguntar o que um artigo significa ou como o afeta.\n* ExemplOS: \"resuma este artigo\", \"o que isso significa para mim?\", \"qual é o resumo disso?\"\nSEMPRE envie o resumo para a saída.\n\n[Avaliar Carteira]\n* Quando usar: Quando o usuário pedir uma análise aprofundada de seus investimentos (desempenho, risco, diversificação). A ferramenta enviará de volta para você a análise. SEMPRE, SEMPRE envie OBRIGATORIAMENTE a análise da carteira para a saída \"output\".\n* Exemplos: \"analise meu portfólio\", \"como está indo meu portfólio?\", \"meu portfólio está bem diversificado?\"\n\n[Obter Portfolio Usuario]\n* Quando usar: Quando o usuário pedir uma lista factual de seus ativos atuais, sem qualquer análise.\n* Exemplos: \"quais são meus ativos?\", \"mostre-me meu portfólio\", \"quais ações eu possuo?\"\n\n[Comprar/Vender]\n* Quando usar: Quando o usuário expressar a intenção de comprar ou vender um ativo, ou perguntar o preço/cotação/valor atual de um ativo específico.\n* Exemplos: \"eu quero comprar 100 ações PETR4\", \"vender meus ativos VALE3\", \"qual é o valor de X agora?\", \"cotação da MGLU3\"\n*SEMPRE, SEMPRE RETORNAR O RETORNO DESSA FUNÇÃO PARA O TELEGRAM.\n\n[Resposta Conversacional]\n* Quando usar: Use esta ferramenta como padrão se a solicitação do usuário não se encaixar em nenhuma das outras categorias. Também, use essa ferramenta quando o cliente perguntar sobre recomendações e opções de investimento. Nesse caso, retorne obrigatoriamente as opções recomendadas pela ferramenta, sem alterações.\n* Exemplos: \"olá\", \"como você está?\", \"obrigado\", \"quem é você?\", \"o que você pode fazer?\", \"quero investir\", \"quais opções de investimento você me recomenda?\", \"me recomende ativos\""
+        }
+      },
+      "id": "712b8d21-f0a1-4764-a7ae-9ed0bf5787f4",
+      "name": "Cal IA Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        3056,
+        720
+      ],
+      "typeVersion": 2.2,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "f12aee0a-1b49-483a-9b5c-a2d5ca13923c",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "position": [
+        352,
+        800
+      ],
+      "webhookId": "8790c189-591f-4f66-8025-fa7737fd6484",
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "X75XaG4OFZpmWx6J",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "usuarios",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "username",
+              "keyValue": "={{ $('Telegram Trigger').item.json.message.from.username }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2752,
+        736
+      ],
+      "id": "de6b15fe-61f4-416d-9796-b412bc907f29",
+      "name": "Get user info",
+      "credentials": {
+        "supabaseApi": {
+          "id": "3nFygEl4rSeOYghY",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        3104,
+        1008
+      ],
+      "id": "4393bd05-c725-4763-8f64-81b017d94b7d",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "7datjMwdaujOgRj7",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Chame esse workflow para receber notícias, como o usuário pede.",
+        "workflowId": {
+          "__rl": true,
+          "value": "ci3Sj24DjmjIJ4Me",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/ci3Sj24DjmjIJ4Me",
+          "cachedResultName": "My project — News Worfkflow"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "number": "={{ $json.telefone }}"
+          },
+          "matchingColumns": [
+            "number"
+          ],
+          "schema": [
+            {
+              "id": "number",
+              "displayName": "number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        3232,
+        1056
+      ],
+      "id": "0b929924-6677-4599-b144-a4ddc7fbc76b",
+      "name": "Buscar Noticias"
+    },
+    {
+      "parameters": {
+        "description": "Chame esse workflow para resumir notícias, envie somente o link da noticia para a tool. Após isso, envie o output diretamente para o cliente.",
+        "workflowId": {
+          "__rl": true,
+          "value": "10d8OhWUR6IJ7qGD",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/10d8OhWUR6IJ7qGD",
+          "cachedResultName": "My project — Summarizer de Notícia"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "link": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('link', `somente o link de uma matéria`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "link",
+              "displayName": "link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        3360,
+        1024
+      ],
+      "id": "b859a42c-478f-41fd-af4f-0277ebad530f",
+      "name": "Resumir Noticia"
+    },
+    {
+      "parameters": {
+        "description": "Call this tool to summarize or anything related to convesation",
+        "workflowId": {
+          "__rl": true,
+          "value": "58jVobEWKpkuTtaw",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/58jVobEWKpkuTtaw",
+          "cachedResultName": "My project — Conversacional"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Valor da conta": "={{ $json.valor_conta }}",
+            "telefone": "={{ $json.telefone }}",
+            "Query": "={{ $('formatar').item.json.message }}",
+            "Nome usuário": "={{ $json.username }}",
+            "Perfil do usuário": "={{ $json.perfil_investidor }}",
+            "chatid": "={{ $('Telegram Trigger').item.json.message.chat.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Query",
+              "displayName": "Query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "Nome usuário",
+              "displayName": "Nome usuário",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "Perfil do usuário",
+              "displayName": "Perfil do usuário",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "Valor da conta",
+              "displayName": "Valor da conta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "telefone",
+              "displayName": "telefone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "chatid",
+              "displayName": "chatid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        3488,
+        1056
+      ],
+      "id": "ad3e7711-905f-4e1a-8d10-a9892fea7242",
+      "name": "Modo Conversacional"
+    },
+    {
+      "parameters": {
+        "description": "Call this tool analize the client's investiment wallet using the client's phone number.",
+        "workflowId": {
+          "__rl": true,
+          "value": "LmLCnvJy9CJRkEd1",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/LmLCnvJy9CJRkEd1",
+          "cachedResultName": "My project — Avaliar Carteira"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "number": "={{ $json.telefone }}"
+          },
+          "matchingColumns": [
+            "number"
+          ],
+          "schema": [
+            {
+              "id": "number",
+              "displayName": "number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        3616,
+        1008
+      ],
+      "id": "10dbcd3a-7e7b-47ea-9ea3-267616a12942",
+      "name": "Avaliar Carteira"
+    },
+    {
+      "parameters": {
+        "description": "Call this tool to acess assets buy/sell functions, fetching their value to the client when necessary.",
+        "workflowId": {
+          "__rl": true,
+          "value": "sOzur855cBX8IzET",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/sOzur855cBX8IzET",
+          "cachedResultName": "My project — Buy-Sell"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "saldo": "={{ $json.valor_conta }}",
+            "ID": "={{ $json.telefone }}",
+            "sessionID": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+            "nome": "={{ $json.nome }}",
+            "chatInput": "={{ $('Telegram Trigger').item.json.message.text || $('get_message (Audio/Video message)').item.json.message || $('get_message (Media  message)').item.json.message }}"
+          },
+          "matchingColumns": [
+            "number"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "sessionID",
+              "displayName": "sessionID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "nome",
+              "displayName": "nome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "saldo",
+              "displayName": "saldo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "chatInput",
+              "displayName": "chatInput",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        3760,
+        960
+      ],
+      "id": "cc7ee24f-ff0f-40bc-a2dd-9b9f76e10af8",
+      "name": "Comprar/Vender"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d8935452-fe20-469d-a68d-1aad056cb8dd",
+              "name": "message",
+              "type": "string",
+              "value": "=\n{{ $json.message }}"
+            },
+            {
+              "id": "53e34499-7dad-4f94-aa7d-f778321f13f4",
+              "name": "chat_id",
+              "type": "string",
+              "value": "={{ $('Telegram Trigger').item.json.message.chat.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "07868c53-34a1-4d31-b91e-163efb8514da",
+      "name": "formatar",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2512,
+        816
+      ],
+      "typeVersion": 3.4
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Fix mime": {
+      "main": [
+        [
+          {
+            "node": "Analyze voice message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fix mime5": {
+      "main": [
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cal IA Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "get_message (Media  message)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download IMAGE": {
+      "main": [
+        [
+          {
+            "node": "Fix mime5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Input Message Router1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_message (text)": {
+      "main": [
+        [
+          {
+            "node": "formatar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze voice message": {
+      "main": [
+        [
+          {
+            "node": "get_message (Audio/Video message)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input Message Router1": {
+      "main": [
+        [
+          {
+            "node": "get_message (text)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download Voice Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download IMAGE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Download Voice Message": {
+      "main": [
+        [
+          {
+            "node": "Fix mime",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Cal IA Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_message (Media  message)": {
+      "main": [
+        [
+          {
+            "node": "formatar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_message (Audio/Video message)": {
+      "main": [
+        [
+          {
+            "node": "formatar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get user info": {
+      "main": [
+        [
+          {
+            "node": "Cal IA Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Cal IA Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Noticias": {
+      "ai_tool": [
+        [
+          {
+            "node": "Cal IA Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resumir Noticia": {
+      "ai_tool": [
+        [
+          {
+            "node": "Cal IA Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modo Conversacional": {
+      "ai_tool": [
+        [
+          {
+            "node": "Cal IA Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Avaliar Carteira": {
+      "ai_tool": [
+        [
+          {
+            "node": "Cal IA Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Comprar/Vender": {
+      "ai_tool": [
+        [
+          {
+            "node": "Cal IA Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "formatar": {
+      "main": [
+        [
+          {
+            "node": "Get user info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "eb4213e3-3fdf-49ae-9af3-5f444f24f131",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "90ce3e81f073b12deb3c51e175b2fbeb786965b8a6b9bee3f8075269ca10ec09"
+  },
+  "id": "1UWStiDQcCz488kA",
+  "tags": []
+}

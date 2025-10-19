@@ -1,0 +1,212 @@
+{
+  "name": "Avaliar Carteira",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "number",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -128,
+        0
+      ],
+      "id": "bbc3062a-e2c4-42f9-b2a7-534f89bfa6d0",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data }}",
+        "options": {
+          "systemMessage": "Seu trabalho é, dos ativos do cliente, avaliar o rendimento dos principais, o mais valiosos e, se é importante, quais ativos comprar/vender. Resuma, gere uma mensagem na propriedade de até 90 palavras. "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        832,
+        0
+      ],
+      "id": "70d6224e-197f-4168-9a77-e0b83ae74b1d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        704,
+        208
+      ],
+      "id": "4be75972-228f-4726-8110-c1b7a5bf69bc",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "idmpDg7SRgYSVKdz",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "usuarios_has_ativos",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "usuarios_id",
+              "condition": "eq",
+              "keyValue": "={{$json.number}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        80,
+        0
+      ],
+      "id": "0c558623-4c49-4d77-8e68-fc86dcdded63",
+      "name": "Get many rows",
+      "credentials": {
+        "supabaseApi": {
+          "id": "3nFygEl4rSeOYghY",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        544,
+        0
+      ],
+      "id": "0fc588e1-1993-4cfd-8631-50e64e8bafc1",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "ativos",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "ticker",
+              "condition": "eq",
+              "keyValue": "={{ $json.ativos_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        256,
+        0
+      ],
+      "id": "f5f01920-c1ea-444a-8329-6b704918ec84",
+      "name": "Get many rows1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "3nFygEl4rSeOYghY",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "number": 557599772720
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get many rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows": {
+      "main": [
+        [
+          {
+            "node": "Get many rows1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5bd2ae7d-1e18-46cd-9e6b-8e937a5f0aac",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "90ce3e81f073b12deb3c51e175b2fbeb786965b8a6b9bee3f8075269ca10ec09"
+  },
+  "id": "LmLCnvJy9CJRkEd1",
+  "tags": []
+}

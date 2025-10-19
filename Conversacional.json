@@ -1,0 +1,286 @@
+{
+  "name": "Conversacional",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "Query"
+            },
+            {
+              "name": "Nome usuário"
+            },
+            {
+              "name": "Perfil do usuário"
+            },
+            {
+              "name": "Valor da conta",
+              "type": "number"
+            },
+            {
+              "name": "telefone",
+              "type": "number"
+            },
+            {
+              "name": "chatid"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -688,
+        0
+      ],
+      "id": "e2978303-5c44-4d78-9983-feca269d29aa",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When Executed by Another Workflow').item.json.Query }}\n",
+        "options": {
+          "systemMessage": "=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<agentConfiguration>\n    <systemPersona>\n        Você é um assistente IA com dois modos operacionais: Assistente de Investimentos e Assistente de Conversa Geral.\n    </systemPersona>\n\n    <modes>\n        <mode id=\"recommendation\">\n            <triggers>\n                <description>Gatilhos para análise financeira.</description>\n                <intent>solicitar_recomendacao_investimento</intent>\n                <keywords>\n                    <keyword>me recomende ativos</keyword>\n                    <keyword>quais ativos eu deveria comprar</keyword>\n                    <keyword>que ações são boas pra eu comprar</keyword>\n                    <keyword>que ações são boas pra eu vender</keyword>\n                    <keyword>sugestão de investimento</keyword>\n                    <keyword>recomendar ações</keyword>\n                    <keyword>analisar minha carteira</keyword>\n                </keywords>\n            </triggers>\n            \n            <instructions>\n                <step>1. Ao identificar um gatilho, requisite os dados necessários (Perfil, Ativos Atuais, Ativos Sugeridos).</step>\n                <step>2. Receba os dados de entrada (que serão fornecidos externamente).</step>\n                <step>3. Analise o <userProfile> (ex: Conservador, Moderado, Agressivo).</step>\n                <step>4. Compare os <currentAssets> (ativos atuais do usuário) com os <suggestedAssets> (ativos recomendados fornecidos).</step>\n                <step>5. Avalie a afinidade, diversificação, risco e alinhamento com o <userProfile>.</step>\n                <step>6. Formule uma recomendação financeira concisa.</step>\n            </instructions>\n            \n            <outputConstraints>\n                <description>Restrições estritas para a saída de recomendação.</description>\n                <maxLength characters=\"200\" />\n                <recommendationCount approximate=\"5\" />\n                <tone>Profissional, objetivo e responsável.</tone>\n            </outputConstraints>\n\n            </mode>\n\n        <mode id=\"general\">\n            <triggers>\n                <type>fallback</type>\n                <description>Ativado se o <userInput> NÃO corresponder aos gatilhos do modo 'recommendation'.</description>\n            </triggers>\n            \n            <instructions>\n                <step>1. Responda à consulta do usuário de forma prestativa e natural.</step>\n                <step>2. Mantenha um tom conversacional.</step>\n                <step>3. NÃO forneça conselhos financeiros, recomendações de ativos ou análises de mercado, mesmo que solicitado indiretamente.</step>\n                <step>4. Se a conversa se aproximar de finanças, reforce que conselhos específicos exigem a ativação do modo de recomendação.</step>\n            </instructions>\n        </mode>\n    </modes>\n</agentConfiguration>\n\nDados do usuário:\nNome: {{ $('When Executed by Another Workflow').item.json['Nome usuário'] }}\nPerfil: {{ $('When Executed by Another Workflow').item.json['Perfil do usuário'] }}\nValor na conta: {{ $('When Executed by Another Workflow').item.json['Valor da conta'] }}\nChatid: {{ $('When Executed by Another Workflow').item.json.chatid }}\nTelefone {{ $('When Executed by Another Workflow').item.json.telefone }}\n\n\nquery: {{ $('When Executed by Another Workflow').item.json.Query }}\n\nAtivos do usuário:\n{{ $json.data.map((item) => {\n  // O (?? 'N/A') garante que, se um campo não existir (como 'valor' no BDR), \n  // ele exibirá 'N/A' em vez de 'undefined'.\n  return `Nome: ${item.Nome}\nTicker: ${item.ticker}\nClasse: ${item.Classe}\nRisco: ${item.Risco}\nRendimento_12_meses: ${item.Rendimento_12_meses ?? 'N/A'}\nvalor: ${item.valor ?? 'N/A'}\n\\n\\n`;\n}); }}\n\nOs ativos recomendados devem ser buscados com a ferramenta Supabase\nLEMBRE-SE. SEJA SUCINTO. MÁXIMO DE 200 CARACTERES"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "962ee791-79cb-447d-bc6d-827b8e723e16",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        80,
+        208
+      ],
+      "id": "8fc5a3bf-6b1f-443e-ad67-5ffb70b33ab2",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "idmpDg7SRgYSVKdz",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get btg research recommendations",
+        "operation": "getAll",
+        "tableId": "recomendacoes",
+        "returnAll": true,
+        "filterType": "none"
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        368,
+        224
+      ],
+      "id": "f0ab74f4-381f-4dad-a074-92ca3d879d3d",
+      "name": "Get recomendation",
+      "credentials": {
+        "supabaseApi": {
+          "id": "3nFygEl4rSeOYghY",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "ativos",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "ticker",
+              "condition": "eq",
+              "keyValue": "={{ $json.ativos_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        0
+      ],
+      "id": "d6036533-e29a-4b37-95a9-e6fa794044c1",
+      "name": "Get many rows1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "3nFygEl4rSeOYghY",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "usuarios_has_ativos",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "usuarios_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.telefone }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        0
+      ],
+      "id": "78ecd8bc-878f-441b-86c1-4fccc0142b49",
+      "name": "Get many rows2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "3nFygEl4rSeOYghY",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        0
+      ],
+      "id": "a0ed56c5-9f4a-427d-9fe9-b6b2506a2368",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('When Executed by Another Workflow').item.json.chatid }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        208
+      ],
+      "id": "3cef7deb-513c-464e-8998-67188877adbf",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "7datjMwdaujOgRj7",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get many rows2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get recomendation": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows2": {
+      "main": [
+        [
+          {
+            "node": "Get many rows1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "643a230e-c31e-4fc4-abf3-75562f1c393a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "90ce3e81f073b12deb3c51e175b2fbeb786965b8a6b9bee3f8075269ca10ec09"
+  },
+  "id": "58jVobEWKpkuTtaw",
+  "tags": []
+}

@@ -1,0 +1,386 @@
+{
+  "name": "News Worfkflow",
+  "nodes": [
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        544
+      ],
+      "id": "d9e75a5b-15e1-4943-a971-9f6aa33ae3c1",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "idmpDg7SRgYSVKdz",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Baseado nas notícias enviadas, julgue as 5 mais relevantes para o usuário do banco baseado em seus ativos. Rode a tool getAtivos primeiro, depois, ranqueie do mais relevante para o menos relevante para os ativos do usuário. Use os tickers e nomes das empresas como base para a relevância. Diversifique as notícias: caso tenham mais de duas notícia sobre o mesmo ativo, use outra de outro ativo.\n\nAs notícias são:\n\n{{ $json.data.map(noticia => `Manchete: ${noticia.title} \\n Link: ${noticia.link}`).join('\\n\\n') }}\n\nRetorne no formato:\n\nManchete\nLink\n\npara cada notícia.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        128,
+        224
+      ],
+      "id": "cf495ad7-1ecc-4d2e-be46-bdbe6fc42370",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "number",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -928,
+        176
+      ],
+      "id": "7070ec6d-0b03-40d9-b3e1-11b3c800dea3",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "usuarios_has_ativos",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "usuarios_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.number }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -672,
+        192
+      ],
+      "id": "f4c1e3d1-4b46-4355-af1b-19a481eb874f",
+      "name": "Get many rows1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "3nFygEl4rSeOYghY",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        224
+      ],
+      "id": "426ac486-a393-4c59-8082-d129592f5bb5",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "ativos",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "ticker",
+              "condition": "eq",
+              "keyValue": "={{ $json.ativos_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -512,
+        208
+      ],
+      "id": "052d5160-1bfc-4480-8787-f7f9e2af0515",
+      "name": "Get many rows2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "3nFygEl4rSeOYghY",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ommggltmqhennqrgmoef.supabase.co/rest/v1/rpc/buscar_noticias_relevantes",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"p_ticker\": \"{{ $json.ticker }}\",\n  \"p_nome\": \"{{ $json.Nome }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -304,
+        208
+      ],
+      "id": "7c31d891-8f9b-44b2-8673-2ae7c809472a",
+      "name": "HTTP Request",
+      "credentials": {
+        "supabaseApi": {
+          "id": "3nFygEl4rSeOYghY",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use for retrieving user assets. Run this tool always.",
+        "operation": "getAll",
+        "tableId": "usuarios_has_ativos",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "usuarios_id",
+              "condition": "eq",
+              "keyValue": "={{ $('When Executed by Another Workflow').item.json.number }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        272,
+        464
+      ],
+      "id": "8303313c-8c2a-4964-9f37-940e103901d3",
+      "name": "getAtivos",
+      "credentials": {
+        "supabaseApi": {
+          "id": "3nFygEl4rSeOYghY",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Get many rows2": [
+      {
+        "json": {
+          "Nome": "BDR Tesla",
+          "ticker": "TSLA34",
+          "Classe": "BDR",
+          "Risco": "Muito Alto",
+          "Rendimento_12M_Porcentagem": -5.5,
+          "valor": 7393
+        }
+      },
+      {
+        "json": {
+          "Nome": "Cardano",
+          "ticker": "ADA",
+          "Classe": "Criptomoeda",
+          "Risco": "Muito Alto",
+          "Rendimento_12M_Porcentagem": 15.6,
+          "valor": 341
+        }
+      },
+      {
+        "json": {
+          "Nome": "Tesouro Selic 2027",
+          "ticker": "TESOURO SELIC 2027",
+          "Classe": "Renda Fixa",
+          "Risco": "Muito Baixo",
+          "Rendimento_12M_Porcentagem": 10.5,
+          "valor": 135126
+        }
+      },
+      {
+        "json": {
+          "Nome": "Petrobras PN",
+          "ticker": "PETR4",
+          "Classe": "Ação",
+          "Risco": "Alto",
+          "Rendimento_12M_Porcentagem": 12.5,
+          "valor": 2970
+        }
+      },
+      {
+        "json": {
+          "Nome": "FII XP Log",
+          "ticker": "XPLG11",
+          "Classe": "FII",
+          "Risco": "Baixo",
+          "Rendimento_12M_Porcentagem": 11.9,
+          "valor": 10165
+        }
+      },
+      {
+        "json": {
+          "Nome": "FII CSHG Recebíveis",
+          "ticker": "HGCR11",
+          "Classe": "FII",
+          "Risco": "Baixo",
+          "Rendimento_12M_Porcentagem": 13.3,
+          "valor": 9340
+        }
+      },
+      {
+        "json": {
+          "Nome": "Debênture Infra ABC",
+          "ticker": "DEB ABC",
+          "Classe": "Renda Fixa",
+          "Risco": "Médio",
+          "Rendimento_12M_Porcentagem": 12.1,
+          "valor": null
+        }
+      },
+      {
+        "json": {
+          "Nome": "LCA IPCA + 6%",
+          "ticker": "LCA BANCO Z",
+          "Classe": "Renda Fixa",
+          "Risco": "Baixo",
+          "Rendimento_12M_Porcentagem": 11.3,
+          "valor": 34213
+        }
+      },
+      {
+        "json": {
+          "Nome": "Rede D'Or ON",
+          "ticker": "RDOR3",
+          "Classe": "Ação",
+          "Risco": "Médio",
+          "Rendimento_12M_Porcentagem": 13.1,
+          "valor": 4057
+        }
+      },
+      {
+        "json": {
+          "Nome": "FII CSHG Logística",
+          "ticker": "HGLG11",
+          "Classe": "FII",
+          "Risco": "Baixo",
+          "Rendimento_12M_Porcentagem": 15.2,
+          "valor": 16038
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get many rows1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows1": {
+      "main": [
+        [
+          {
+            "node": "Get many rows2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getAtivos": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6ede641a-6304-4c46-8426-c1304c5267f6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "90ce3e81f073b12deb3c51e175b2fbeb786965b8a6b9bee3f8075269ca10ec09"
+  },
+  "id": "ci3Sj24DjmjIJ4Me",
+  "tags": []
+}

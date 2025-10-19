@@ -1,0 +1,127 @@
+{
+  "name": "Summarizer de Notícia",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "link"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        64,
+        0
+      ],
+      "id": "cc1a9f85-31f1-493c-aa68-b1483bb57a01",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.content }}",
+        "options": {
+          "systemMessage": "=Seu trabalho é resumir uma notícia para um cliente da BTG Pactual. Priorize os impactos no mercado de ações (se houver impactos claros) e na economia brasileira.\n\nResponda em até 3 parágrafos curtos de até 50 palavras cada, com o objetivo de enviar a mensagem central ao cliente. Traga dados estatísticos e de variação que estiverem na matéria e traga os ativos recomendados na matéria.\n\nEssa mensagem será a resposta de um pedido dele via Whatsapp, portanto formate de acordo com a formatação do Whatsapp e seja objetivo. Envie somente o resumo da matéria, sem intruduções. Retorne somente texto na propriedade \"output\".\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "42a234e3-7f59-49d8-af68-b58e8116cdea",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        288,
+        208
+      ],
+      "id": "cf1a6dc6-e63a-4b10-8e7f-5d6188f3a775",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "idmpDg7SRgYSVKdz",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ \"https://content.btgpactual.com/api/research/public-router/content-hub-news/v1/news/\" + $json.link.match(/\\/noticias\\/([^/]+)/)[0].replace(\"/noticias/\", \"\")}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        0
+      ],
+      "id": "ccfa77f8-545b-47df-8edf-125c3ceb68cd",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f170e507-1725-44aa-b153-8cbc677f67d0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "90ce3e81f073b12deb3c51e175b2fbeb786965b8a6b9bee3f8075269ca10ec09"
+  },
+  "id": "10d8OhWUR6IJ7qGD",
+  "tags": []
+}
