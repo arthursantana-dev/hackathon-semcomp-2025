@@ -1,9 +1,9 @@
 # Agente Financeiro para Telegram BTG
 ## Participantes
-Arthur Alexandre Santos Santana
-Arthur Martins Pereira
-Christyan Paniago Nantes
-Giovanna Nascimento Noventa
+Arthur Alexandre Santos Santana  
+Arthur Martins Pereira  
+Christyan Paniago Nantes  
+Giovanna Nascimento Noventa  
 
 ## Funcionalidades - Agentes
 ### Orquestrador
