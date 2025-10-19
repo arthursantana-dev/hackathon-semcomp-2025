@@ -1,37 +1,53 @@
-# Agente Financeiro para Telegram BTG
+# Agente Financeiro - Telegram BTG AI
 ## Nome da equipe: 93
 ## Participantes
-- Arthur Alexandre Santos Santana  
-- Arthur Martins Pereira  
-- Christyan Paniago Nantes  
-- Giovanna Nascimento Noventa  
+- Arthur Alexandre Santos Santana
+- Arthur Martins Pereira
+- Christyan Paniago Nantes
+- Giovanna Nascimento Noventa
+
+---
+
+## Desenvolvimento
+O sistema foi **desenvolvido e orquestrado com n8n**. Os arquivos **.json** são os arquivos de configuração (workflows) do n8n.
+
+- Sistema de entrada multimodal, com entradas de vídeo, texto e imagem.
+- Integração com o Telegram.
+- Integração com o Google Gemini.
+- Integração com banco de dados PostgreSQL (Supabase) para contexto e dados de usuários, notícias e ativos.
 
 ---
 
 ## Funcionalidades - Agentes
+
 ### Orquestrador
 Delega as funções entre os devidos agentes, assim como recebe as entradas e saídas.
-![Workflow do orquestrador central](Orquestrador.png)
+![Workflow do orquestrador central](/images/Orquestrador.png)
+
 ### Buy/Sell
 Permite a compra e venda de ativos de forma rápida.
-![Workflow do Buy-Sell](Buy-Sell.png)
+![Workflow do Buy-Sell](/images/Buy-Sell.png)
+
 ### Notícias
 Busca as notícias do Research do BTG Pactual mais relevantes para o portfólio do usuário.
-![Workflow do Notícia](News%20Workflow.png)
+![Workflow do Notícia](/images/News%20Workflow.png)
+
 ### Resumo de notícias
 Permite a síntese das notícias do Research do BTG Pactual: busca a notícia completa através de um link e resume-a.
-![Workflow do Resumo de Notícias](Summarizer%20de%20Notícia.png)
+![Workflow do Resumo de Notícias](/images/Summarizer%20de%20Notícia.png)
+
 ### Analisar carteira
 Busca os ativos do portfólio do usuário e analisa como aqueles ativos estão se comportando com o tempo.
-![Workflow de Análise de carteira](Avaliar%20Carteira.png)
+![Workflow de Análise de carteira](/images/Avaliar%20Carteira.png)
+
 ### Conversacional
 Gera recomendações de investimento e gerencia conversas gerais.
-![Workflow do Conversacional](Conversacional.png)
+![Workflow do Conversacional](/images/Conversacional.png)
 
----
+--- 
 
-## Features
-- Sistema de entrada multimodal, com entradas de vídeo, texto e imagem
-- Integração com o Telegram
-- Integração com o Google Gemini
-- Integração com banco de dados PostgreSQL (Supabase) para contexto e dados de usuários, notícias e ativos.
+## Como executar 
+1. Crie um projeto n8n.
+2. Importe os arquivos .json.
+3. Configure as credenciais do Supabase, Telegram e Gemini.
+4. Testar o chatbot. 
