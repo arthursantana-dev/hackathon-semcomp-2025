@@ -14,7 +14,7 @@ O sistema foi **desenvolvido e orquestrado com n8n**. Os arquivos **.json** são
 - Sistema de entrada multimodal, com entradas de vídeo, texto e imagem.
 - Integração com o Telegram.
 - Integração com o Google Gemini.
-- Integração com banco de dados PostgreSQL (Supabase) para contexto e dados de usuários, notícias e ativos.
+- Integração com banco de dados PostgreSQL (Supabase) para contexto e dados de usuários, notícias e ativos. Os arquivos .csv presentes na pasta _tabelas_ seguem os schemas utilizados para o mock do banco de dados para: ativos, notícias, recomendaçãões de investimentos, usuários e carteira do usuário.  
 
 ---
 
