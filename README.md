@@ -50,4 +50,4 @@ Gera recomendações de investimento e gerencia conversas gerais.
 1. Crie um projeto n8n.
 2. Importe os arquivos .json.
 3. Configure as credenciais do Supabase, Telegram e Gemini.
-4. Testar o chatbot. 
+4. Teste o chatbot. 
