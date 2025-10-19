@@ -1,0 +1,18 @@
+Ticker,Setor,Recomendacao,Preco_Alvo_BRL,Potencial_Alta_BRL,Data_Recomendacao,Risco,Rendimento_12M_Porcentagem
+ABEV3,Consumo & Varejo,Compra,16,0.4286,2024-06-28 00:00:00+00,Baixo,2.1
+AMBP3,Ambiental,Venda,0,-30,2025-10-19 03:30:29+00,Alto,-40
+B3SA3,Financeiro,Compra,14,0.3084,2024-06-28 00:00:00+00,Médio,11
+BBAS3,Financeiro,Compra,34.2,0.2667,2024-06-28 00:00:00+00,Baixo,25.1
+BBDC4,Financeiro,Compra,16,0.2702,2024-06-28 00:00:00+00,Baixo,10.3
+ELET3,Utilities & Energia,Compra,48,0.3873,2024-06-28 00:00:00+00,Médio,9.9
+GGBR4,Metais & Mineração,Compra,22,0.2644,2024-06-28 00:00:00+00,Médio,14.3
+ITUB4,Financeiro,Compra,42,0.3084,2024-06-28 00:00:00+00,Baixo,18
+LREN3,Consumo & Varejo,Compra,20,0.5504,2024-06-28 00:00:00+00,Médio,8.4
+MGLU3,Consumo & Varejo,Compra,16,0.3793,2024-06-28 00:00:00+00,Muito Alto,-30.5
+PETR4,"Petróleo, Gás & Petroquímicos",Compra,47,0.2668,2024-06-28 00:00:00+00,Alto,12.5
+RDOR3,Saúde,Compra,36,0.4286,2024-06-28 00:00:00+00,Médio,13.1
+RENT3,Transportes,Compra,65,0.5116,2024-06-28 00:00:00+00,Médio,19.2
+SUZB3,Papel & Celulose,Compra,65,0.3238,2024-06-28 00:00:00+00,Médio,7.6
+USIM5,Metais & Mineração,Compra,800,80,2025-10-19 03:28:59+00,Médio,24
+VALE3,Metais & Mineração,Compra,79,0.3036,2024-06-28 00:00:00+00,Médio,5.2
+WEGE3,Bens de Capital & Indústria,Compra,50,0.2626,2024-06-28 00:00:00+00,Médio,15.8
